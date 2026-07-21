@@ -2,7 +2,7 @@
 // Ela usa o token secreto do Notion (guardado nas variáveis de ambiente do
 // Netlify) para buscar os imóveis e devolve só os dados prontos pro site.
 
-const DATABASE_ID = "3623f68dc7588012985ef118e4cd98fa";
+const DATABASE_ID = "3623f68dc75880a395c0f106153130e1";
 
 exports.handler = async function () {
   const NOTION_TOKEN = process.env.NOTION_TOKEN;
