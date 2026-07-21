@@ -85,9 +85,10 @@ exports.handler = async function () {
           (o) => o.name
         ),
         dataAnuncio: p["Data do Anúncio"]?.date?.start || null,
-        fotos: (p["Fotos do imóvel"]?.files || []).map((f) =>
-          f.type === "external" ? f.external.url : f.file.url
-        ),
+        fotos: (p["Fotos do imóvel"]?.files || []).map((f) => ({
+          url: f.type === "external" ? f.external.url : f.file.url,
+          nome: f.name || "",
+        })),
       };
     });
 
