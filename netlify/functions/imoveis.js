@@ -65,24 +65,27 @@ exports.handler = async function () {
     const textOf = (prop) =>
       (prop?.rich_text || []).map((t) => t.plain_text).join("");
 
+    const titleOf = (prop) =>
+      (prop?.title || []).map((t) => t.plain_text).join("");
+
     const imoveis = results.map((page) => {
       const p = page.properties;
       return {
         id: page.id,
         status: p["Situação do Anúncio"]?.status?.name || "",
         contrato: textOf(p["Contrato/ID Imóvel"]),
-        descricao: textOf(p["Descrição do Imóvel"]),
+        descricao: titleOf(p["Descrição do Imóvel"]),
         area: p["Área"]?.number ?? null,
         cidade: p["Cidade"]?.select?.name || "",
         localizacao: textOf(p["Localização"]),
-        tipo: p["Tipo de imóvel"]?.select?.name || "",
+        tipo: p["Tipo de Imóvel"]?.select?.name || "",
         documentado: p["Documentado?"]?.select?.name || "",
         valor: p["Valor anunciado"]?.number ?? null,
         negociacao: (p["Forma de Negociação"]?.multi_select || []).map(
           (o) => o.name
         ),
         dataAnuncio: p["Data do Anúncio"]?.date?.start || null,
-        fotos: (p["Fotos do Imóvel"]?.files || []).map((f) =>
+        fotos: (p["Fotos do imóvel"]?.files || []).map((f) =>
           f.type === "external" ? f.external.url : f.file.url
         ),
       };
