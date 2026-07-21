@@ -226,17 +226,76 @@
     line-height: 1;
   }
 
-  .modal-fotos {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
+  .modal-galeria {
+    position: relative;
     margin: 12px 0 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #1a1a1a;
   }
 
-  .modal-fotos img {
-    height: 160px;
-    border-radius: 8px;
-    flex-shrink: 0;
+  .modal-galeria img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .galeria-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.55);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .galeria-nav.anterior { left: 8px; }
+  .galeria-nav.proxima { right: 8px; }
+
+  .galeria-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 0;
+    background: #1a1a1a;
+  }
+
+  .galeria-dots .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .galeria-dots .dot.ativo {
+    background: var(--accent);
+  }
+
+  .galeria-legenda {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 6px 0 0;
+  }
+
+  .modal-descricao {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    margin: 4px 0 16px;
+    padding: 12px 14px;
+    background: rgba(26, 180, 179, 0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
   }
 
   .modal-linha {
@@ -248,13 +307,6 @@
   }
 
   .modal-linha span:first-child { color: var(--text-muted); }
-
-  .modal-descricao {
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--text);
-    margin: 14px 0;
-  }
 </style>
 </head>
 <body>
@@ -305,6 +357,18 @@
     return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(texto)}`;
   }
 
+  function fotoCapa(fotos) {
+    if (!fotos || fotos.length === 0) return null;
+    return (
+      fotos.find((f) => f.nome && f.nome.toLowerCase().includes("capa")) ||
+      fotos[0]
+    );
+  }
+
+  function nomeSemExtensao(nome) {
+    return (nome || "").replace(/\.[^/.]+$/, "");
+  }
+
   function render(lista) {
     const grid = document.getElementById("grid");
     const vazio = document.getElementById("vazio");
@@ -319,14 +383,13 @@
     lista.forEach((im) => {
       const card = document.createElement("div");
       card.className = "card";
-      const foto = im.fotos && im.fotos[0];
+      const capa = fotoCapa(im.fotos);
       card.innerHTML = `
-        <div class="card-foto" style="${foto ? `background-image:url('${foto}')` : ""}">${foto ? "" : "sem foto"}</div>
+        <div class="card-foto" style="${capa ? `background-image:url('${capa.url}')` : ""}">${capa ? "" : "sem foto"}</div>
         <div class="card-body">
           <span class="tag">${im.tipo || "Não informado"}</span><span class="tag-status">${im.status || ""}</span>
           <p class="card-titulo">${im.localizacao || "Localização não informada"}</p>
           <p class="card-sub">${im.cidade || ""}${im.area ? " · " + im.area + " m²" : ""}</p>
-          ${im.descricao ? `<p class="card-descricao">${im.descricao}</p>` : ""}
           <p class="card-valor">${formatarValor(im.valor)}</p>
           ${im.dataAnuncio ? `<p class="card-data">Anunciado em ${formatarData(im.dataAnuncio)}</p>` : ""}
           <a href="${linkWhatsapp(im)}" target="_blank" rel="noopener" class="btn-whatsapp" data-stop="1">Mais informações</a>
@@ -340,17 +403,77 @@
     });
   }
 
+  let imovelAtual = null;
+  let fotoAtual = 0;
+
+  function fotosOrdenadas(im) {
+    const fotos = im.fotos || [];
+    const capa = fotoCapa(fotos);
+    if (!capa) return fotos;
+    return [capa, ...fotos.filter((f) => f !== capa)];
+  }
+
+  function renderGaleria() {
+    const container = document.getElementById("modalGaleria");
+    if (!container) return;
+    const fotos = fotosOrdenadas(imovelAtual);
+
+    if (fotos.length === 0) {
+      container.innerHTML = "";
+      return;
+    }
+
+    const fotoObj = fotos[fotoAtual];
+    const legenda = nomeSemExtensao(fotoObj.nome);
+    const legendaHtml =
+      legenda && !legenda.toLowerCase().includes("capa")
+        ? `<p class="galeria-legenda">${legenda}</p>`
+        : "";
+
+    const setas =
+      fotos.length > 1
+        ? `<button class="galeria-nav anterior" id="galeriaAnterior">‹</button>
+           <button class="galeria-nav proxima" id="galeriaProxima">›</button>`
+        : "";
+
+    const dots =
+      fotos.length > 1
+        ? `<div class="galeria-dots">${fotos
+            .map((_, i) => `<span class="dot${i === fotoAtual ? " ativo" : ""}"></span>`)
+            .join("")}</div>`
+        : "";
+
+    container.innerHTML = `
+      <div class="modal-galeria">
+        <img src="${fotoObj.url}" alt="${legenda || "Foto do imóvel"}" />
+        ${setas}
+      </div>
+      ${legendaHtml}
+      ${dots}
+    `;
+
+    if (fotos.length > 1) {
+      document.getElementById("galeriaAnterior").addEventListener("click", () => {
+        fotoAtual = (fotoAtual - 1 + fotos.length) % fotos.length;
+        renderGaleria();
+      });
+      document.getElementById("galeriaProxima").addEventListener("click", () => {
+        fotoAtual = (fotoAtual + 1) % fotos.length;
+        renderGaleria();
+      });
+    }
+  }
+
   function abrirModal(im) {
+    imovelAtual = im;
+    fotoAtual = 0;
     const conteudo = document.getElementById("modalConteudo");
-    const fotosHtml = (im.fotos || [])
-      .map((f) => `<img src="${f}" alt="Foto do imóvel" />`)
-      .join("");
 
     conteudo.innerHTML = `
       <span class="tag">${im.tipo || "Não informado"}</span><span class="tag-status">${im.status || ""}</span>
       <h2 style="margin:8px 0 4px; font-size:18px;">${im.localizacao || "Localização não informada"}</h2>
       <p style="margin:0; color:var(--text-muted); font-size:13px;">${im.cidade || ""}</p>
-      ${fotosHtml ? `<div class="modal-fotos">${fotosHtml}</div>` : ""}
+      <div id="modalGaleria"></div>
       ${im.descricao ? `<p class="modal-descricao">${im.descricao}</p>` : ""}
       <div class="modal-linha"><span>Valor</span><span>${formatarValor(im.valor)}</span></div>
       ${im.area ? `<div class="modal-linha"><span>Área</span><span>${im.area} m²</span></div>` : ""}
@@ -360,6 +483,8 @@
       ${im.dataAnuncio ? `<div class="modal-linha"><span>Anunciado em</span><span>${formatarData(im.dataAnuncio)}</span></div>` : ""}
       <a href="${linkWhatsapp(im)}" target="_blank" rel="noopener" class="btn-whatsapp" style="margin-top:16px;">Mais informações no WhatsApp</a>
     `;
+
+    renderGaleria();
     document.getElementById("modalOverlay").classList.add("aberto");
   }
 
