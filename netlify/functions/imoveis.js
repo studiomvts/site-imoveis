@@ -81,4 +81,22 @@ exports.handler = async function () {
         negociacao: (p["Forma de Negociação"]?.multi_select || []).map(
           (o) => o.name
         ),
-        dataAnuncio: p
+        dataAnuncio: p["Data do Anúncio"]?.date?.start || null,
+        fotos: (p["Fotos do Imóvel"]?.files || []).map((f) =>
+          f.type === "external" ? f.external.url : f.file.url
+        ),
+      };
+    });
+
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store",
+      },
+      body: JSON.stringify(imoveis),
+    };
+  } catch (err) {
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+  }
+};
