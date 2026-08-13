@@ -6,8 +6,8 @@
 <title>Imóveis disponíveis</title>
 <style>
   :root {
-    --accent: rgb(26, 180, 179);
-    --accent-bg: rgba(26, 180, 179, 0.15);
+    --accent: rgb(191, 149, 63);
+    --accent-bg: rgba(191, 149, 63, 0.15);
     --bg: #000000;
     --card-bg: #111111;
     --card-border: rgba(255, 255, 255, 0.12);
@@ -48,15 +48,14 @@
   }
 
   .brand-mark {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: var(--accent-bg);
-    color: var(--accent);
+    height: 40px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-weight: 700;
+  }
+
+  .brand-mark img {
+    height: 100%;
+    display: block;
   }
 
   #contador {
@@ -293,7 +292,7 @@
     color: var(--text);
     margin: 4px 0 16px;
     padding: 12px 14px;
-    background: rgba(26, 180, 179, 0.08);
+    background: var(--accent-bg);
     border-left: 3px solid var(--accent);
     border-radius: 0 8px 8px 0;
   }
@@ -307,6 +306,16 @@
   }
 
   .modal-linha span:first-child { color: var(--text-muted); }
+
+  footer {
+    text-align: center;
+    padding-top: 28px;
+    margin-top: 32px;
+    border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.6;
+  }
 </style>
 </head>
 <body>
@@ -314,8 +323,9 @@
 <div class="wrap">
   <header>
     <div class="brand">
-      <div class="brand-mark">i</div>
-      <span>Sua logo aqui</span>
+      <div class="brand-mark">
+        <img src="logo.png" alt="Logo Corretor de Imóveis" />
+      </div>
     </div>
     <span id="contador">carregando...</span>
   </header>
@@ -327,6 +337,11 @@
 
   <div id="grid" class="grid"></div>
   <div id="vazio" class="vazio" style="display:none;">Nenhum imóvel encontrado com esses filtros.</div>
+
+  <footer>
+    Marcos Vinícius Santos — Corretor de Imóveis — CRECI 18279<br />
+    Todos os direitos reservados
+  </footer>
 </div>
 
 <div id="modalOverlay" class="modal-overlay">
