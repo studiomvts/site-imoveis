@@ -81,8 +81,14 @@
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 260px));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 300px));
     gap: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   .card {
@@ -106,8 +112,7 @@
     justify-content: center;
     color: rgba(255, 255, 255, 0.25);
     font-size: 13px;
-    background-size: contain;
-    background-repeat: no-repeat;
+    background-size: cover;
     background-position: center;
   }
 
