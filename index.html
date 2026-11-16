@@ -500,9 +500,9 @@
       ${im.descricao ? `<p class="modal-descricao">${im.descricao}</p>` : ""}
       <div class="modal-linha"><span>Valor</span><span>${formatarValor(im.valor)}</span></div>
       ${im.area ? `<div class="modal-linha"><span>Área</span><span>${im.area} m²</span></div>` : ""}
+      ${im.medidasLote ? `<div class="modal-linha"><span>Medidas do lote</span><span>${im.medidasLote}</span></div>` : ""}
       ${im.documentado ? `<div class="modal-linha"><span>Documentação</span><span>${im.documentado}</span></div>` : ""}
       ${im.negociacao && im.negociacao.length ? `<div class="modal-linha"><span>Negociação</span><span>${im.negociacao.join(", ")}</span></div>` : ""}
-      ${im.contrato ? `<div class="modal-linha"><span>Contrato/ID</span><span>${im.contrato}</span></div>` : ""}
       ${im.dataAnuncio ? `<div class="modal-linha"><span>Anunciado em</span><span>${formatarData(im.dataAnuncio)}</span></div>` : ""}
       <a href="${linkWhatsapp(im)}" target="_blank" rel="noopener" class="btn-whatsapp" style="margin-top:16px;">Mais informações no WhatsApp</a>
     `;
