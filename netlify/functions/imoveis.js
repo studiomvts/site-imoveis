@@ -68,12 +68,30 @@ exports.handler = async function () {
     const titleOf = (prop) =>
       (prop?.title || []).map((t) => t.plain_text).join("");
 
+    // Lê qualquer tipo de propriedade simples (texto, número ou seleção) como texto
+    const anyTextOf = (prop) => {
+      if (!prop) return "";
+      if (prop.rich_text) return textOf(prop);
+      if (prop.title) return titleOf(prop);
+      if (prop.number != null) return String(prop.number);
+      if (prop.select) return prop.select.name || "";
+      return "";
+    };
+
+    // Procura a propriedade ignorando diferença de maiúsculas/minúsculas
+    const findProp = (props, nome) => {
+      const chave = Object.keys(props).find(
+        (k) => k.trim().toLowerCase() === nome.toLowerCase()
+      );
+      return chave ? props[chave] : undefined;
+    };
+
     const imoveis = results.map((page) => {
       const p = page.properties;
       return {
         id: page.id,
         status: p["Situação do Anúncio"]?.status?.name || "",
-        contrato: textOf(p["Contrato/ID Imóvel"]),
+        medidasLote: anyTextOf(findProp(p, "Medidas do lote")),
         descricao: titleOf(p["Descrição do Imóvel"]),
         area: p["Área"]?.number ?? null,
         cidade: p["Cidade"]?.select?.name || "",
